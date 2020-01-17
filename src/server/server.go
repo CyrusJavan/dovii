@@ -2,16 +2,40 @@ package server
 
 import (
 	"fmt"
-	"log"
-	"net/http"
+
+	"github.com/CyrusJavan/dovii/src/keyvaluestore"
+	"github.com/gin-gonic/gin"
 )
 
 // StartServer starts the server
 func StartServer() {
-	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":7070", nil))
-}
+	r := gin.Default()
+	var db keyvaluestore.KeyValueStore = make(keyvaluestore.BasicMemory)
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+	r.GET("/:key", func(c *gin.Context) {
+		key := c.Param("key")
+		value, err := db.Get(key)
+		if err != nil {
+			c.JSON(404, gin.H{
+				"error": fmt.Sprint(err),
+			})
+			return
+		}
+		c.JSON(200, gin.H{
+			"value": value,
+		})
+	})
+
+	r.POST("/:key/:value", func(c *gin.Context) {
+		key := c.Param("key")
+		value := c.Param("value")
+		err := db.Set(key, value)
+		if err != nil {
+			c.Status(502)
+			return
+		}
+		c.Status(200)
+	})
+
+	r.Run("127.0.0.1:7070")
 }
