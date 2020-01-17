@@ -2,8 +2,8 @@ package keyvaluestore
 
 import "fmt"
 
-// BasicMemory is the simplest possible in memory database
-// utilizing just a regular map to store keys and values.
+// BasicMemory is the simplest possible in memory database utilizing just a
+// regular map to store keys and values.
 type BasicMemory map[string]string
 
 // Get the value of the key

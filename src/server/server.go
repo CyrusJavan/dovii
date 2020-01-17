@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// StartServer starts the server
+// StartServer starts our API server
 func StartServer() {
 	r := gin.Default()
 	var db keyvaluestore.KeyValueStore = make(keyvaluestore.BasicMemory)
