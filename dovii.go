@@ -27,6 +27,15 @@ func BasicMemEngine(store *KVStore) {
 	store.engine = make(keyvaluestore.BasicMemory)
 }
 
+// BasicFileEngine is the simplest (slowest) on disk engine
+func BasicFileEngine(store *KVStore) {
+	bf, err := keyvaluestore.NewBasicFile()
+	if err != nil {
+		panic(err)
+	}
+	store.engine = bf
+}
+
 // Get accesses the underlying db engine to return a value
 func (store *KVStore) Get(key string) (string, error) {
 	if store.engine == nil {
