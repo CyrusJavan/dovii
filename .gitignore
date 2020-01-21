@@ -17,3 +17,6 @@ bin/
 
 # MacOS
 .DS_Store
+
+# Local benchmark results
+/benchresults

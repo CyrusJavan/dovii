@@ -3,6 +3,7 @@ package keyvaluestore
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -23,7 +24,10 @@ func (bf BasicFile) Get(key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return m[key], nil
+	if val, ok := m[key]; ok {
+		return val, nil
+	}
+	return "", fmt.Errorf("Key not found")
 }
 
 // Set does
