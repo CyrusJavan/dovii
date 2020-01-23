@@ -7,3 +7,4 @@ A key-value data store used for learning more about the internals of a database.
 Changelog:
 
 - String keys and values stored in memory
+- String keys and values stored in json on disk
