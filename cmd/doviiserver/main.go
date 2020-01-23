@@ -13,7 +13,7 @@ type env struct {
 }
 
 func main() {
-	store, err := dovii.NewKVStore(dovii.BasicFileEngine)
+	store, err := dovii.NewKVStore(dovii.BitcaskEngine)
 	if err != nil {
 		log.Fatal(err)
 	}

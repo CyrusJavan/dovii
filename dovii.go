@@ -36,6 +36,15 @@ func BasicFileEngine(store *KVStore) {
 	store.engine = bf
 }
 
+// BitcaskEngine uses a go implementation of bitcask
+func BitcaskEngine(store *KVStore) {
+	bc, err := keyvaluestore.NewBitcask(true)
+	if err != nil {
+		panic(err)
+	}
+	store.engine = bc
+}
+
 // Get accesses the underlying db engine to return a value
 func (store *KVStore) Get(key string) (string, error) {
 	if store.engine == nil {
