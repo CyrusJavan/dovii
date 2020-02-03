@@ -24,7 +24,7 @@ func main() {
 	r.GET("/:key", env.getHandler)
 	r.POST("/:key/:value", env.setHandler)
 
-	r.Run("127.0.0.1:7070")
+	r.Run("0.0.0.0:7070")
 }
 
 func (e *env) setHandler(c *gin.Context) {
