@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/CyrusJavan/dovii"
 	"github.com/gorilla/mux"
@@ -27,7 +28,18 @@ func main() {
 
 	s.routes()
 
-	log.Fatal(http.ListenAndServe("0.0.0.0:7070", s))
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func(){
+		err := http.ListenAndServe("0.0.0.0:7070", s)
+		if err != nil {
+			log.Println("listenandserve:", err)
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
 }
 
 func (s *server) routes() {
