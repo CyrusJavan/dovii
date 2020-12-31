@@ -3,7 +3,7 @@ package dovii
 import (
 	"fmt"
 
-	"github.com/CyrusJavan/dovii/src/keyvaluestore"
+	"github.com/CyrusJavan/dovii/internal/keyvaluestore"
 )
 
 // KVStore is how consumers of dovii will access the underlying data store

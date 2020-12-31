@@ -3,7 +3,7 @@ package keyvaluestore_test
 import (
 	"testing"
 
-	"github.com/CyrusJavan/dovii/src/keyvaluestore"
+	"github.com/CyrusJavan/dovii/internal/keyvaluestore"
 	"github.com/stretchr/testify/assert"
 )
 
