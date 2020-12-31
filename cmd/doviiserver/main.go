@@ -1,15 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
+	"net/http"
 
 	"github.com/CyrusJavan/dovii"
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 )
 
-type env struct {
-	store *dovii.KVStore
+type server struct {
+	store  *dovii.KVStore
+	router *mux.Router
 }
 
 func main() {
@@ -18,36 +20,58 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r := gin.Default()
-	env := &env{store: store}
-
-	r.GET("/:key", env.getHandler)
-	r.POST("/:key/:value", env.setHandler)
-
-	r.Run("0.0.0.0:7070")
-}
-
-func (e *env) setHandler(c *gin.Context) {
-	key := c.Param("key")
-	value := c.Param("value")
-	err := (*e.store).Set(key, value)
-	if err != nil {
-		c.Status(502)
-		return
+	s := &server{
+		store:  store,
+		router: mux.NewRouter(),
 	}
-	c.Status(200)
+
+	s.routes()
+
+	log.Fatal(http.ListenAndServe("0.0.0.0:7070", s))
 }
 
-func (e *env) getHandler(c *gin.Context) {
-	key := c.Param("key")
-	value, err := (*e.store).Get(key)
-	if err != nil {
-		c.JSON(404, gin.H{
-			"error": fmt.Sprint(err),
+func (s *server) routes() {
+	s.router.HandleFunc("/{key}", s.getHandler()).
+		Methods("GET")
+
+	s.router.HandleFunc("/{key}/{value}", s.setHandler()).
+		Methods("POST")
+}
+
+func (s *server) setHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		key := vars["key"]
+		value := vars["value"]
+		err := (*s.store).Set(key, value)
+		if err != nil {
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
+	}
+}
+
+func (s *server) getHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		key := vars["key"]
+		value, err := (*s.store).Get(key)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		b, err := json.Marshal(map[string]string{
+			"value": value,
 		})
-		return
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = w.Write(b)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	c.JSON(200, gin.H{
-		"value": value,
-	})
+}
+func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.router.ServeHTTP(w, r)
 }
