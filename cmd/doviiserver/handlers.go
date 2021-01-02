@@ -22,14 +22,14 @@ func (s *server) setHandler() http.HandlerFunc {
 		}
 		lmData, err := json.Marshal(lm)
 		if err != nil {
-			w.Write([]byte("marshal failed" + err.Error()))
+			_, _ = w.Write([]byte("marshal failed" + err.Error()))
 			w.WriteHeader(http.StatusBadGateway)
 			return
 		}
 		future := s.raftServer.Apply(lmData, time.Second)
 		err = future.Error()
 		if err != nil {
-			w.Write([]byte(err.Error()))
+			_, _ = w.Write([]byte(err.Error()))
 			w.WriteHeader(http.StatusBadGateway)
 			return
 		}
@@ -43,7 +43,7 @@ func (s *server) getHandler() http.HandlerFunc {
 		log.Println("received GET for key=", key)
 		value, err := (*s.store).Get(key)
 		if err != nil {
-			w.Write([]byte(err.Error()))
+			_, _ = w.Write([]byte(err.Error()))
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -53,9 +53,6 @@ func (s *server) getHandler() http.HandlerFunc {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err = w.Write(b)
-		if err != nil {
-			log.Fatal(err)
-		}
+		_, _ = w.Write(b)
 	}
 }
