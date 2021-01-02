@@ -22,4 +22,5 @@ A key-value data store used for learning more about the internals of a database.
 - String keys and values stored in json on disk
 - Bitcask support
 - Deploy multiple instances with docker-compose, load balanced behind traefik
-  - Currently does not return correct values for GETs, this is expected, now we do RAFT to get values consistent across cluster
+  - At this point the system does not return correct values for GETs, this is expected, now we do RAFT to get values consistent across cluster
+- Use hashicorp/raft to guarantee consistency across nodes
