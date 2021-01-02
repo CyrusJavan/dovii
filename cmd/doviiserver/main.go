@@ -129,9 +129,11 @@ func (s *server) setHandler() http.HandlerFunc {
 		vars := mux.Vars(r)
 		key := vars["key"]
 		value := vars["value"]
+		log.Println("received POST for key=", key)
 		err := (*s.store).Set(key, value)
 		if err != nil {
 			w.WriteHeader(http.StatusBadGateway)
+			w.Write([]byte(err.Error()))
 			return
 		}
 	}
@@ -141,9 +143,11 @@ func (s *server) getHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		key := vars["key"]
+		log.Println("received GET for key=", key)
 		value, err := (*s.store).Get(key)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte(err.Error()))
 			return
 		}
 		b, err := json.Marshal(map[string]string{
