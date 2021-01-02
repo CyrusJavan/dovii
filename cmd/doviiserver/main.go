@@ -15,7 +15,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/hashicorp/raft"
 	"github.com/hashicorp/raft-boltdb"
-	"github.com/kelseyhightower/envconfig"
 )
 
 type server struct {
@@ -24,23 +23,15 @@ type server struct {
 	raftServer *raft.Raft
 }
 
-type ServerConfig struct {
-}
-
 func main() {
 	log.SetOutput(os.Stderr)
-	var sc ServerConfig
-	err := envconfig.Process("dovii", &sc)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	store, err := dovii.NewKVStore(dovii.BitcaskEngine)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	r, err := newRaftServer(&sc, store)
+	r, err := newRaftServer(store)
 	if err != nil {
 		log.Println("raft:", err)
 	}
@@ -59,7 +50,7 @@ func main() {
 	}
 }
 
-func newRaftServer(sc *ServerConfig, store *dovii.KVStore) (*raft.Raft, error) {
+func newRaftServer(store *dovii.KVStore) (*raft.Raft, error) {
 	adAddr := GetOutboundTCPAddr()
 	adAddr.Port = 7654
 	conf := raft.DefaultConfig()
@@ -130,7 +121,18 @@ func (s *server) setHandler() http.HandlerFunc {
 		key := vars["key"]
 		value := vars["value"]
 		log.Println("received POST for key=", key)
-		err := (*s.store).Set(key, value)
+		lm := LogMessage{
+			Key:   key,
+			Value: value,
+		}
+		lmData, err := json.Marshal(lm)
+		if err != nil {
+			w.Write([]byte("marshal failed" + err.Error()))
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
+		future := s.raftServer.Apply(lmData, time.Second)
+		err = future.Error()
 		if err != nil {
 			w.WriteHeader(http.StatusBadGateway)
 			w.Write([]byte(err.Error()))
