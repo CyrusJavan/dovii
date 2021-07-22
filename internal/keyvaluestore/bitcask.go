@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/prologic/bitcask"
+	"git.mills.io/prologic/bitcask"
 )
 
 // Bitcask is

@@ -6,7 +6,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/raft v1.2.0
 	github.com/hashicorp/raft-boltdb v0.0.0-20171010151810-6e5ba93211ea
-	github.com/prologic/bitcask v0.3.10
+	git.mills.io/prologic/bitcask v0.3.10
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/exp v0.0.0-20201229011636-eab1b5eb1a03 // indirect
 	golang.org/x/sys v0.0.0-20201223074533-0d417f636930 // indirect
